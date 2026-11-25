@@ -1,0 +1,512 @@
+<title>인천TV</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* 레이아웃: 1180px 신문 그리드. 헤드라인+인기순위 2단, 최신뉴스 4단, 전체기사 목록+사이드. 흰 바탕 단일 테마(사용자 지정). */
+:root {
+  --bg: #ffffff;
+  --ink: #15191f;
+  --ink-2: #4a5260;
+  --ink-3: #8a919c;
+  --line: #e4e7ec;
+  --soft: #f4f6f9;
+  --accent: #0b5cad;
+  --accent-ink: #ffffff;
+  --hot: #d6372b;
+  --font-ko: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-num: "Inter", "Noto Sans KR", system-ui, sans-serif;
+  --wrap: 1180px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ko); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+a:hover .t, a:hover.t { text-decoration: underline; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+ul { list-style: none; margin: 0; padding: 0; }
+.wrap { max-width: var(--wrap); margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+
+/* 예시 안내 */
+.notice { background: var(--soft); color: var(--ink-2); font-size: 12px; text-align: center; padding-block: 6px; }
+
+/* 상단 유틸바 */
+.util { border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
+.util .wrap { display: flex; justify-content: space-between; align-items: center; padding-block: 8px; gap: 12px; }
+.util ul { display: flex; gap: 16px; align-items: center; }
+.util a:hover { color: var(--accent); }
+
+/* 로고 */
+.masthead .wrap { display: flex; align-items: center; justify-content: center; padding-block: 26px 22px; position: relative; }
+.logo { display: inline-flex; align-items: baseline; gap: 10px; }
+.logo-mark { font-weight: 900; font-size: 38px; letter-spacing: -1.5px; }
+.logo-mark b { color: var(--accent); }
+.logo-sub { font-size: 12px; color: var(--ink-3); letter-spacing: 0.12em; }
+
+/* 메뉴바 */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 8px; height: 52px; }
+.icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 6px; flex: none; }
+.icon-btn:hover { background: var(--soft); }
+.icon-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+.menu { display: flex; flex: 1; justify-content: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.menu::-webkit-scrollbar { display: none; }
+.menu a { display: block; padding: 0 18px; line-height: 52px; font-weight: 700; font-size: 16px; white-space: nowrap; position: relative; }
+.menu a:hover, .menu a[aria-current] { color: var(--accent); }
+.menu a[aria-current]::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: -1px; height: 3px; background: var(--accent); }
+
+/* 전체메뉴 패널 */
+.drawer-bg { position: fixed; inset: 0; background: rgba(15, 20, 28, 0.45); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.drawer { position: fixed; top: 0; left: 0; bottom: 0; width: min(340px, 86vw); background: var(--bg); z-index: 41; transform: translateX(-100%); transition: transform 0.25s ease; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top, 0px) + 18px) 22px calc(env(safe-area-inset-bottom, 0px) + 22px) max(22px, env(safe-area-inset-left, 0px)); gap: 20px; overflow-y: auto; }
+.open .drawer { transform: none; }
+.open .drawer-bg { opacity: 1; pointer-events: auto; }
+.drawer-head { display: flex; justify-content: space-between; align-items: center; }
+.drawer-head .logo-mark { font-size: 26px; }
+.search { display: flex; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; }
+.search input { flex: 1; min-width: 0; border: 0; padding: 10px 12px; font: inherit; background: var(--bg); color: var(--ink); }
+.search input:focus { outline: none; }
+.search button { padding: 0 14px; font-weight: 700; background: var(--ink); color: var(--bg); }
+.drawer nav a { display: block; padding: 12px 2px; border-bottom: 1px solid var(--line); font-weight: 500; font-size: 16px; }
+.drawer nav a:hover { color: var(--accent); }
+
+/* 썸네일 자리표시 */
+.thumb { position: relative; aspect-ratio: 16 / 10; max-width: 100%; border-radius: 4px; overflow: hidden; background:
+  radial-gradient(120% 90% at 85% 15%, hsl(var(--h) 70% 82%) 0%, transparent 55%),
+  radial-gradient(90% 80% at 10% 100%, hsl(calc(var(--h) + 30) 55% 40%) 0%, transparent 60%),
+  linear-gradient(160deg, hsl(var(--h) 45% 62%), hsl(calc(var(--h) + 20) 50% 32%)); }
+.thumb::after { content: attr(data-cap); position: absolute; left: 10px; bottom: 8px; font-size: 11px; color: rgba(255,255,255,0.85); letter-spacing: 0.04em; }
+.cat { display: inline-block; font-size: 12px; font-weight: 700; color: var(--accent); }
+.date { font-size: 12.5px; color: var(--ink-3); }
+
+/* 섹션 공통 */
+main { display: grid; gap: 44px; padding-block: 28px 56px; }
+main > .wrap { width: 100%; }
+.sec-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 18px; }
+.sec-head h2 { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+.sec-head a { font-size: 13px; color: var(--ink-2); }
+.sec-head a:hover { color: var(--accent); }
+
+/* 1단: 헤드라인 + 인기 */
+.top { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 32px; }
+.slider { position: relative; min-width: 0; }
+.slides { position: relative; overflow: hidden; border-radius: 6px; touch-action: pan-y; }
+.track { display: flex; transition: transform 0.5s ease; }
+.slide { flex: 0 0 100%; position: relative; }
+.slide .thumb { aspect-ratio: 16 / 9; border-radius: 0; }
+.slide .thumb::after { display: none; }
+.slide .cap { position: absolute; inset: auto 0 0 0; padding: 60px 28px 26px; background: linear-gradient(transparent, rgba(8, 14, 24, 0.82)); color: #fff; display: grid; gap: 8px; }
+.slide .cap .cat { color: #fff; background: var(--accent); padding: 2px 8px; border-radius: 3px; justify-self: start; }
+.slide h3 { font-size: 27px; font-weight: 700; line-height: 1.35; letter-spacing: -0.6px; }
+.ctrl { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 12px; }
+.dots { display: flex; gap: 6px; }
+.dots button { width: 28px; height: 4px; border-radius: 2px; background: var(--line); }
+.dots button[aria-current="true"] { background: var(--accent); }
+.arrows { display: flex; gap: 6px; }
+.arrows button { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; }
+.arrows button:hover { border-color: var(--ink); }
+.arrows svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+.count { font-size: 13px; color: var(--ink-3); }
+
+.rank ol { list-style: none; margin: 0; padding: 0; counter-reset: r; }
+.rank li a { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.rank li:last-child a { border-bottom: 0; }
+.rank .n { font-family: var(--font-num); font-weight: 600; font-size: 18px; line-height: 1.3; color: var(--ink-3); }
+.rank li:nth-child(-n+3) .n { color: var(--hot); }
+.rank .t { font-size: 14.5px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* 2단: 최신뉴스 4단 */
+.latest { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.col { display: grid; gap: 0; align-content: start; min-width: 0; }
+.col .lead { display: grid; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.col .lead h3 { font-size: 17px; font-weight: 700; line-height: 1.4; letter-spacing: -0.3px; }
+.col .item { display: grid; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.col .item .t { font-size: 14.5px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* 쇼츠 */
+.shorts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.short { display: grid; gap: 8px; min-width: 0; }
+.short .thumb { aspect-ratio: 9 / 14; border-radius: 8px; }
+.short .thumb::before { content: ""; position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: rgba(255,255,255,0.9) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7l9 5-9 5z' fill='%2315191f'/%3E%3C/svg%3E") center / 22px no-repeat; }
+.short .t { font-size: 14px; font-weight: 500; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* 3단: 전체기사 + 사이드 */
+.all { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; }
+.list li a { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; padding: 18px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.list li:first-child a { padding-top: 0; }
+.list .body { display: grid; gap: 6px; min-width: 0; }
+.list h3 { font-size: 18px; font-weight: 700; line-height: 1.4; letter-spacing: -0.3px; }
+.list p { margin: 0; color: var(--ink-2); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.more { display: block; width: 100%; margin-top: 20px; padding: 13px; border: 1px solid var(--line); border-radius: 6px; font-weight: 500; color: var(--ink-2); }
+.more:hover { border-color: var(--ink); color: var(--ink); }
+
+.side { display: grid; gap: 28px; align-content: start; }
+.box { border: 1px solid var(--line); border-radius: 6px; padding: 18px; }
+.box h2 { font-size: 16px; font-weight: 900; margin-bottom: 10px; }
+.box p { margin: 0 0 14px; color: var(--ink-2); font-size: 14px; }
+.btn { display: block; text-align: center; padding: 11px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.btn:hover { filter: brightness(1.08); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags a { font-size: 13px; padding: 5px 10px; border-radius: 999px; background: var(--soft); color: var(--ink-2); }
+.tags a:hover { background: var(--accent); color: var(--accent-ink); }
+
+/* 푸터 */
+footer { border-top: 1px solid var(--line); background: var(--soft); color: var(--ink-2); font-size: 13px; }
+.f-links { border-bottom: 1px solid var(--line); }
+.f-links .wrap { display: flex; flex-wrap: wrap; gap: 6px 22px; padding-block: 14px; }
+.f-links a { font-weight: 500; color: var(--ink); }
+.f-links a:hover { color: var(--accent); }
+.f-info .wrap { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px; padding-block: 26px 34px; align-items: start; }
+.f-info .logo-mark { font-size: 24px; color: var(--ink); }
+.f-info dl { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.f-info dt { display: inline; color: var(--ink-3); }
+.f-info dd { display: inline; margin: 0 0 0 4px; }
+.f-info div.row { display: inline; }
+.copy { margin-top: 10px; color: var(--ink-3); }
+
+.to-top { position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; z-index: 15; opacity: 0; pointer-events: none; transition: opacity 0.2s; box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.to-top.show { opacity: 1; pointer-events: auto; }
+.to-top svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.4; }
+
+/* 태블릿 */
+@media (max-width: 1024px) {
+  .top { grid-template-columns: 1fr; }
+  .latest { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
+  .shorts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .shorts .short:nth-child(n+4) { display: none; }
+  .all { grid-template-columns: 1fr; }
+  .side { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* 모바일 */
+@media (max-width: 680px) {
+  body { font-size: 14.5px; }
+  .util .hide-m { display: none; }
+  .masthead .wrap { padding-block: 16px 14px; }
+  .logo-mark { font-size: 28px; }
+  .logo-sub { display: none; }
+  .nav .wrap { height: 48px; gap: 2px; }
+  .menu { justify-content: flex-start; }
+  .menu a { padding: 0 12px; line-height: 48px; font-size: 15px; }
+  .menu a[aria-current]::after { left: 12px; right: 12px; }
+  main { gap: 36px; padding-block: 18px 44px; }
+  .wrap.full-m { padding-left: 0; padding-right: 0; }
+  .slides { border-radius: 0; }
+  .slide .thumb { aspect-ratio: 4 / 3; }
+  .slide .cap { padding: 50px 16px 18px; }
+  .slide h3 { font-size: 20px; }
+  .ctrl { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .rank { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .latest { grid-template-columns: 1fr; row-gap: 28px; }
+  .shorts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shorts .short:nth-child(n+3) { display: none; }
+  .list li a { grid-template-columns: minmax(0, 1fr) 110px; gap: 14px; padding: 14px 0; }
+  .list .thumb { order: 2; aspect-ratio: 4 / 3; }
+  .list .thumb::after { display: none; }
+  .list h3 { font-size: 16px; }
+  .list p { display: none; }
+  .side { grid-template-columns: 1fr; }
+  .f-info .wrap { grid-template-columns: 1fr; gap: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .track, .drawer, .drawer-bg, .to-top { transition: none; }
+}
+</style>
+
+<div class="notice">레이아웃 시안입니다. 기사와 회사 정보는 예시이며 실제 내용으로 바꿔 쓰시면 됩니다.</div>
+
+<div class="util">
+  <div class="wrap">
+    <span class="num" id="today">2026-11-25 (수)</span>
+    <ul>
+      <li class="hide-m"><a href="#">매체소개</a></li>
+      <li><a href="#">기사제보</a></li>
+      <li><a href="#">로그인</a></li>
+    </ul>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="인천TV 홈">
+      <span class="logo-mark">인천<b>TV</b></span>
+      <span class="logo-sub">INCHEON LOCAL NEWS</span>
+    </a>
+  </div>
+</header>
+
+<nav class="nav" aria-label="주요 메뉴">
+  <div class="wrap">
+    <button class="icon-btn" id="openMenu" aria-label="전체메뉴 열기" aria-expanded="false" aria-controls="drawer">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="menu">
+      <a href="#" aria-current="page">뉴스</a>
+      <a href="#">문화/여행</a>
+      <a href="#">IT/과학</a>
+      <a href="#">스포츠</a>
+      <a href="#">트렌드</a>
+      <a href="#">쇼츠</a>
+    </div>
+    <button class="icon-btn" id="openSearch" aria-label="기사검색">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div id="drawerRoot">
+  <div class="drawer-bg" id="drawerBg"></div>
+  <aside class="drawer" id="drawer" aria-label="전체메뉴">
+    <div class="drawer-head">
+      <span class="logo-mark">인천<b>TV</b></span>
+      <button class="icon-btn" id="closeMenu" aria-label="전체메뉴 닫기">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <form class="search" id="searchForm" role="search">
+      <label for="q" hidden>기사검색</label>
+      <input id="q" type="search" placeholder="검색어를 입력하세요">
+      <button type="submit">검색</button>
+    </form>
+    <nav>
+      <a href="#">전체기사</a>
+      <a href="#">뉴스</a>
+      <a href="#">문화/여행</a>
+      <a href="#">IT/과학</a>
+      <a href="#">스포츠</a>
+      <a href="#">트렌드</a>
+      <a href="#">쇼츠</a>
+    </nav>
+  </aside>
+</div>
+
+<main>
+  <!-- 헤드라인 + 인기 콘텐츠 -->
+  <div class="wrap full-m">
+    <div class="top">
+      <section class="slider" aria-label="주요 기사" aria-roledescription="carousel">
+        <div class="slides" id="slides">
+          <div class="track" id="track"></div>
+        </div>
+        <div class="ctrl">
+          <div class="dots" id="dots"></div>
+          <div class="arrows">
+            <span class="count num" id="count">1 / 5</span>
+            <button id="prev" aria-label="이전 기사"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+            <button id="next" aria-label="다음 기사"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+        </div>
+      </section>
+      <section class="rank" aria-labelledby="rank-h">
+        <div class="sec-head"><h2 id="rank-h">인기 콘텐츠</h2><a href="#">더보기 ›</a></div>
+        <ol id="rankList"></ol>
+      </section>
+    </div>
+  </div>
+
+  <!-- 최신뉴스 -->
+  <section class="wrap" aria-labelledby="latest-h">
+    <div class="sec-head"><h2 id="latest-h">최신뉴스</h2><a href="#">더보기 ›</a></div>
+    <div class="latest" id="latest"></div>
+  </section>
+
+  <!-- 쇼츠 -->
+  <section class="wrap" aria-labelledby="shorts-h">
+    <div class="sec-head"><h2 id="shorts-h">쇼츠</h2><a href="#">더보기 ›</a></div>
+    <div class="shorts" id="shorts"></div>
+  </section>
+
+  <!-- 전체기사 -->
+  <div class="wrap">
+    <div class="all">
+      <section aria-labelledby="all-h">
+        <div class="sec-head"><h2 id="all-h">전체기사</h2><a href="#">더보기 ›</a></div>
+        <ul class="list" id="allList"></ul>
+        <button class="more" id="moreBtn">기사 더보기</button>
+      </section>
+      <aside class="side">
+        <div class="box">
+          <h2>기사제보</h2>
+          <p>동네 소식, 불편 사항, 미담을 알려주세요. 기자가 확인 후 연락드립니다.</p>
+          <a class="btn" href="#">제보하기</a>
+        </div>
+        <div class="box">
+          <h2>많이 찾는 키워드</h2>
+          <div class="tags">
+            <a href="#">#지하철연장</a><a href="#">#항만</a><a href="#">#전세시장</a><a href="#">#김장철</a>
+            <a href="#">#섬여행</a><a href="#">#프로야구</a><a href="#">#축제</a><a href="#">#AI교육</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="f-links">
+    <div class="wrap">
+      <a href="#">매체소개</a><a href="#">기사제보</a><a href="#">광고문의</a>
+      <a href="#"><b>개인정보처리방침</b></a><a href="#">청소년보호정책</a><a href="#">저작권보호정책</a>
+    </div>
+  </div>
+  <div class="f-info">
+    <div class="wrap">
+      <span class="logo-mark">인천<b>TV</b></span>
+      <div>
+        <dl>
+          <div class="row"><dt>주소</dt><dd>OO시 OO구 OO로 00, 0층</dd></div>
+          <div class="row"><dt>대표전화</dt><dd class="num">000-0000-0000</dd></div>
+          <div class="row"><dt>법인명</dt><dd>(예시) 주식회사 OO미디어</dd></div>
+          <div class="row"><dt>등록번호</dt><dd class="num">OO 아 00000</dd></div>
+          <div class="row"><dt>등록일</dt><dd class="num">0000-00-00</dd></div>
+          <div class="row"><dt>발행·편집인</dt><dd>홍길동</dd></div>
+          <div class="row"><dt>청소년보호책임자</dt><dd>홍길동</dd></div>
+        </dl>
+        <p class="copy">Copyright © <span class="num">2026</span> 인천TV. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button class="to-top" id="toTop" aria-label="맨 위로"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+
+<script>
+(function () {
+  // 예시 기사 데이터 (실제 기사로 교체)
+  var headlines = [
+    { c: "뉴스", t: "도심 순환 트램 2단계 노선 확정, 2029년 개통 목표", h: 205 },
+    { c: "문화/여행", t: "겨울 섬 여행 수요 늘자 여객선 증편… 주말 왕복 4회로", h: 190 },
+    { c: "IT/과학", t: "시내 초등학교 30곳, 내년부터 AI 코딩 수업 정규 편성", h: 255 },
+    { c: "스포츠", t: "지역 연고 프로배구팀, 홈 개막 5연승으로 단독 선두", h: 12 },
+    { c: "트렌드", t: "옛 창고를 고친 복합문화공간, 개관 한 달 만에 방문객 5만 명", h: 32 }
+  ];
+  var rank = [
+    "항만 배후단지 물류센터 착공… 일자리 1200개 기대",
+    "[영상] 새벽 어시장 경매 현장, 대게 시세 지난해보다 15% 내려",
+    "수능 당일 시내버스 집중 배차, 지하철 첫차도 30분 앞당겨",
+    "[인터뷰] 전국체전 수영 3관왕, 고등학교 2학년 선수",
+    "구도심 골목 야시장, 이번 주말 시작… 먹거리 부스 40곳",
+    "아파트 전세가 6주 연속 상승, 매매가는 보합세",
+    "공영주차장 요금 모바일 결제 전면 도입"
+  ];
+  var cats = ["뉴스", "문화/여행", "IT/과학", "스포츠"];
+  var latest = [
+    { lead: "시, 미래 해양산업 육성 계획 발표… 5년간 2조 원 투입", items: ["상수도본부, 가뭄 대응 평가 '우수' 기관 선정", "주민배심원 50명 위촉, 시정 공약 이행 직접 점검", "도서관 야간 개방 시범 운영, 평일 밤 10시까지"], h: 200 },
+    { lead: "근대건축 거리 걷기 투어, 겨울 시즌 프로그램 운영", items: ["시립미술관, 항구 사진가 회고전 12월 개막", "등대 전망대 리모델링 마치고 재개장", "섬마을 민박 20곳, 겨울 할인 이벤트"], h: 160 },
+    { lead: "스타트업 지원센터, 해양 데이터 기업 15곳 신규 입주", items: ["공공 와이파이 버스정류장 300곳으로 확대", "드론 배송 시범 구역, 섬 지역 3곳 추가", "청소년 메이커 대회, 로봇 부문 결선 진출팀 확정"], h: 230 },
+    { lead: "프로야구 연고 구단, 신인 드래프트 1순위 지역 출신 지명", items: ["시민 마라톤 참가 신청 사흘 만에 마감", "생활체육 배드민턴 리그 개막, 120개 팀 참가", "공공 수영장 겨울방학 특강 접수 시작"], h: 20 }
+  ];
+  var shorts = [
+    { t: "새벽 4시 어시장, 60초로 보기", h: 195 },
+    { t: "트램 시승기, 직접 타봤습니다", h: 215 },
+    { t: "섬마을 겨울 풍경 한 바퀴", h: 175 },
+    { t: "골목 야시장 먹거리 베스트 3", h: 25 },
+    { t: "등대 전망대에서 본 일몰", h: 40 }
+  ];
+  var all = [
+    { c: "뉴스", t: "시, 미래 해양산업 육성 계획 발표… 5년간 2조 원 투입", d: "항만 물류, 해양 관광, 친환경 선박 세 분야에 예산을 집중한다. 시는 연말까지 세부 실행안을 내놓을 계획이다.", h: 200, day: 0 },
+    { c: "뉴스", t: "상수도본부, 가뭄 대응 평가 '우수' 기관 선정", d: "비상 급수 체계와 노후관 교체 실적에서 높은 점수를 받았다.", h: 190, day: 0 },
+    { c: "문화/여행", t: "근대건축 거리 걷기 투어, 겨울 시즌 프로그램 운영", d: "해설사와 함께 개항기 건물 12곳을 둘러보는 90분 코스다. 매주 토요일 오전에 출발한다.", h: 150, day: 0 },
+    { c: "IT/과학", t: "스타트업 지원센터, 해양 데이터 기업 15곳 신규 입주", d: "입주 기업은 2년간 사무공간과 클라우드 이용료를 지원받는다.", h: 235, day: 1 },
+    { c: "스포츠", t: "시민 마라톤 참가 신청 사흘 만에 마감", d: "올해는 해안도로 구간을 새로 넣은 하프 코스가 추가됐다.", h: 15, day: 1 },
+    { c: "트렌드", t: "옛 창고를 고친 복합문화공간, 개관 한 달 만에 방문객 5만 명", d: "주말에는 플리마켓과 공연이 함께 열리며 젊은 층 방문이 크게 늘었다.", h: 35, day: 1 },
+    { c: "뉴스", t: "공영주차장 요금 모바일 결제 전면 도입", d: "다음 달부터 시내 공영주차장 80곳에서 앱으로 요금을 낼 수 있다.", h: 210, day: 2 },
+    { c: "문화/여행", t: "시립미술관, 항구 사진가 회고전 12월 개막", d: "1970년대부터 부두 풍경을 기록해 온 작가의 사진 200여 점을 선보인다.", h: 170, day: 2 },
+    { c: "IT/과학", t: "드론 배송 시범 구역, 섬 지역 3곳 추가", d: "의약품과 생필품을 중심으로 하루 두 차례 배송한다.", h: 245, day: 2 },
+    { c: "스포츠", t: "생활체육 배드민턴 리그 개막, 120개 팀 참가", d: "연령별 4개 부문으로 나눠 내년 2월까지 주말마다 경기를 치른다.", h: 25, day: 3 }
+  ];
+
+  var base = new Date(2026, 10, 25);
+  function fmt(offset) {
+    var d = new Date(base); d.setDate(d.getDate() - offset);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function esc(s) { return s.replace(/[&<>"]/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]; }); }
+  function thumb(h, cap) { return '<div class="thumb" style="--h:' + h + '" data-cap="' + (cap || "사진 자리") + '" role="img" aria-label="기사 사진 자리"></div>'; }
+
+  // 슬라이더
+  var track = document.getElementById("track"), dots = document.getElementById("dots");
+  headlines.forEach(function (a, i) {
+    track.insertAdjacentHTML("beforeend",
+      '<a class="slide" href="#" aria-roledescription="slide" aria-label="' + (i + 1) + ' / ' + headlines.length + '">' + thumb(a.h) +
+      '<div class="cap"><span class="cat">' + a.c + '</span><h3 class="t">' + esc(a.t) + '</h3></div></a>');
+    dots.insertAdjacentHTML("beforeend", '<button aria-label="' + (i + 1) + '번 기사 보기"></button>');
+  });
+  var idx = 0, timer = null, n = headlines.length;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function go(i) {
+    idx = (i + n) % n;
+    track.style.transform = "translateX(" + (-idx * 100) + "%)";
+    Array.prototype.forEach.call(dots.children, function (b, j) { b.setAttribute("aria-current", j === idx ? "true" : "false"); });
+    document.getElementById("count").textContent = (idx + 1) + " / " + n;
+  }
+  function play() { stop(); if (!reduce) timer = setInterval(function () { go(idx + 1); }, 5000); }
+  function stop() { if (timer) clearInterval(timer); timer = null; }
+  Array.prototype.forEach.call(dots.children, function (b, j) { b.addEventListener("click", function () { go(j); play(); }); });
+  document.getElementById("prev").addEventListener("click", function () { go(idx - 1); play(); });
+  document.getElementById("next").addEventListener("click", function () { go(idx + 1); play(); });
+  var slides = document.getElementById("slides");
+  slides.addEventListener("mouseenter", stop);
+  slides.addEventListener("mouseleave", play);
+  var sx = null;
+  slides.addEventListener("touchstart", function (e) { sx = e.touches[0].clientX; stop(); }, { passive: true });
+  slides.addEventListener("touchend", function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+    sx = null; play();
+  });
+  go(0); play();
+
+  // 인기 콘텐츠
+  document.getElementById("rankList").innerHTML = rank.map(function (t, i) {
+    return '<li><a href="#"><span class="n">' + (i + 1) + '</span><span class="t">' + esc(t) + '</span></a></li>';
+  }).join("");
+
+  // 최신뉴스
+  document.getElementById("latest").innerHTML = latest.map(function (col, ci) {
+    return '<div class="col"><a class="lead" href="#">' + thumb(col.h) + '<span class="cat">' + cats[ci] + '</span><h3 class="t">' + esc(col.lead) + '</h3></a>' +
+      col.items.map(function (t, i) { return '<a class="item" href="#"><span class="t">' + esc(t) + '</span><span class="date num">' + fmt(i) + '</span></a>'; }).join("") + '</div>';
+  }).join("");
+
+  // 쇼츠
+  document.getElementById("shorts").innerHTML = shorts.map(function (s) {
+    return '<a class="short" href="#">' + thumb(s.h, "영상 자리") + '<span class="t">' + esc(s.t) + '</span></a>';
+  }).join("");
+
+  // 전체기사
+  var list = document.getElementById("allList"), shown = 0;
+  function more() {
+    var next = all.slice(shown, shown + 5);
+    list.insertAdjacentHTML("beforeend", next.map(function (a) {
+      return '<li><a href="#">' + thumb(a.h) + '<div class="body"><span class="cat">' + a.c + '</span><h3 class="t">' + esc(a.t) + '</h3><p>' + esc(a.d) + '</p><span class="date num">' + fmt(a.day) + '</span></div></a></li>';
+    }).join(""));
+    shown += next.length;
+    document.getElementById("moreBtn").hidden = shown >= all.length;
+  }
+  document.getElementById("moreBtn").addEventListener("click", more);
+  more();
+
+  // 전체메뉴
+  var root = document.getElementById("drawerRoot"), openBtn = document.getElementById("openMenu");
+  function openMenu(focusSearch) {
+    root.classList.add("open"); openBtn.setAttribute("aria-expanded", "true");
+    setTimeout(function () { (focusSearch ? document.getElementById("q") : document.getElementById("closeMenu")).focus(); }, 50);
+  }
+  function closeMenu() { root.classList.remove("open"); openBtn.setAttribute("aria-expanded", "false"); openBtn.focus(); }
+  openBtn.addEventListener("click", function () { openMenu(false); });
+  document.getElementById("openSearch").addEventListener("click", function () { openMenu(true); });
+  document.getElementById("closeMenu").addEventListener("click", closeMenu);
+  document.getElementById("drawerBg").addEventListener("click", closeMenu);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && root.classList.contains("open")) closeMenu(); });
+  document.getElementById("searchForm").addEventListener("submit", function (e) { e.preventDefault(); });
+
+  // 맨 위로
+  var toTop = document.getElementById("toTop");
+  window.addEventListener("scroll", function () { toTop.classList.toggle("show", window.scrollY > 600); }, { passive: true });
+  toTop.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
+})();
+</script>
